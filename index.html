@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="UniStateDLO: Unified Generative State Estimation and Tracking of Deformable Linear Objects Under Occlusion for Constrained Manipulation">
+  <meta name="keywords" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UniStateDLO: Unified Generative State Estimation and Tracking of Deformable Linear Objects Under Occlusion for Constrained Manipulation</title>
+
+  <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> -->
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <!-- <link rel="stylesheet" href="./static/css/misc.css"> -->
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-fullhd">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">UniStateDLO: Unified Generative State Estimation<br />
+          and Tracking of Deformable Linear Objects<br />
+          Under Occlusion for Constrained Manipulation</h1>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              Anonymous Author(s)
+            </span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="is-size-4 publication-authors">
+              <span class="author-block"><b>Submitted to IEEE T-RO</b></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns is-vcentered  is-centered">
+          <img src='docs/figs/top_figure.jpg' width="95%">
+          </br>
+        </div>
+        <br>
+        <h2 class="subtitle has-text-centered">
+          We propose <b>UniStateDLO</b>, a novel unified perception framework for deformable linear objects (DLOs) that 
+          supports both <b>single-frame state estimation</b> and <b>cross-frame tracking</b> of DLOs under severe occlusions. 
+          Leveraging diffusion-based generative modeling, UniStateDLO reconstructs complete DLO configurations from even 
+          highly partial point clouds with strong accuracy, robustness and real-time performance. Trained entirely on 
+          synthetic data, it generalizes in a zero-shot manner to diverse real-world DLOs and provides a reliable perception 
+          front-end for constrained manipulation tasks.
+        </h2>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="hero is-light is-small">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full-width">
+
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Perception of deformable linear objects (DLOs), such as cables, ropes, and wires, is fundamental to downstream robotic manipulation. Despite extensive progress, vision-based perception remains highly vulnerable to occlusions arising from obstacles and large deformations.
+              Moreover, the high dimensionality of the state space, the lack of distinctive visual features, and the presence of sensor noises further compound the challenges of reliable DLO perception.
+              To address these open issues, this paper presents UniStateDLO, the first complete DLO perception pipeline with deep-learning methods that achieves robust performance under severe occlusion, covering both <b>single-frame state estimation</b> and <b>cross-frame state tracking</b> from partial point clouds.
+              Both tasks are formulated as conditional generative problems, leveraging the strong capability of diffusion models to capture the complex mapping between highly partial observations and high-dimensional DLO states.
+              Trained solely on large-scale synthetic data, UniStateDLO achieves strong data efficiency by enabling zero-shot sim-to-real generalization without any real-world training data.
+              Comprehensive simulation and real-world experiments demonstrate that UniStateDLO outperforms all state-of-the-art baselines in both estimation and tracking, producing globally smooth yet locally precise DLO state predictions in real time, even under substantial occlusions. 
+              Integration into a closed-loop DLO manipulation system further validates its ability to support stable feedback control in complex, constrained 3-D environments.
+            </p>
+          </div>
+          <br>
+
+          <h2 class="title is-3">Video</h2>
+          <video id="teaser" muted height="90%" width="90%" controls="controls">
+            <source src="docs/videos/supplementary_video.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full-width">
+
+          <h2 class="title is-3">Method Overview</h2>
+          <div class="content has-text-justified">
+            <p>Overview of the proposed UniStateDLO pipeline, comprising <b>Single-Frame State Estimation</b> for initialization and 
+              <b>Cross-Frame State Tracking</b> for sequential motion tracking. Given a partial DLO point cloud, state estimation module 
+              first produces coarse predictions through two complementary branches based on PointNet++ features, and then refines them 
+              via a diffusion model. For cross-frame tracking, a KNN-based feature aggregation module extracts node-wise local features 
+              around the previous frame's predictions, followed by another diffusion model to infer per-node cross-frame motion.
+            </p>
+          </div>
+          <div class="columns is-centered has-text-centered">
+            <div class="column is-fullwidth">
+              <div class="column is-fullwidth">
+                <img src="docs/figs/overview.png" alt="" width="90%">
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="columns is-centered has-text-centered">
+      <div class="container is-max-widescreen">
+
+        <h2 class="title is-3" style="margin-top: -40px;">Large-Scale Data Synthesis in Simulation</h2>
+        <div class="content has-text-justified">
+          <p style="text-align: center;">
+            The DLOs are randomly deformed to generate a dataset of 300K samples only in simulation, 
+            where the simulator is based on Unity3D engine in combination with the Obi Rope package.
+            The <b>lengths, diameters, stiffness</b> of DLOs and <b>camera viewpoints</b> are randomized.
+          </p>
+        </div>
+
+        <video id="data_collection" autoplay muted playsinline height="70%" width="70%" controls="controls"
+        style="display: block; margin: 0 auto; margin-bottom: 0px;">
+          <source src="docs/videos/data_collection_video.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="columns is-centered has-text-centered">
+      <div class="container is-max-widescreen">
+
+        <h2 class="title is-3"> Real-World Experimental Results </h2>
+        <div class="content has-text-justified">
+          <p style="text-align: center;">
+            The UniStateDLO model trained on the synthetic dataset can be <b>directly applied on diverse real-world DLOs</b> without collecting any realistic data or re-training.
+            All inference is performed in <b>real time</b> on a single NVIDIA RTX 4090 GPU, where the single-frame estimation stage runs at on average 94.19 ms/frame and cross-frame tracking at 89.35 ms/frame.
+          </p>
+        </div>
+
+        <h3 class="title is-4" style="margin-top: 40px;">DLOs Used in Real-World Experiments</h3>
+        <div class="content has-text-justified">
+          <p style="text-align: center;">
+            We use four DLOs with distinct materials and physical properties to evaluate the real-world generalization performance of proposed UniStateDLO.
+          </p>
+        </div>
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-fullwidth">
+            <div class="column is-fullwidth">
+              <img src="docs/figs/DLOs.png" alt="" width="65%">
+            </div>
+          </div>
+        </div>
+        
+        <h3 class="title is-4" style="margin-top: 20px;">Real-World Single-Frame State Estimation</h3>
+        <div class="content has-text-justified">
+          <p style="text-align: center; margin-bottom: -20px;">
+            Quanlitative comparison with single-frame estimation baselines. (Use the left and right buttons to switch between different cases)
+          </p>
+        </div>
+        <div id="realworld-detection"></div>
+
+        <div class="content has-text-justified">
+          <p style="text-align: center;margin-top: 40px; margin-bottom: -20px">
+            More visualized cases of real-world state estimations achieved by UniStateDLO.
+          </p>
+        </div>
+        <div id="realworld-detection-more-case"></div>
+
+        <h3 class="title is-4" style="margin-top: 60px;">Real-World Cross-Frame State Tracking</h3>
+        <div class="content has-text-justified">
+          <p style="text-align: center; margin-bottom: 0px;">
+            Quanlitative comparison with cross-frame tracking baselines.
+          </p>
+        </div>
+        <div id="realworld-tracking"></div>
+
+        <div class="content has-text-justified">
+          <p style="text-align: center; margin-top: 40px;margin-bottom: -10px;">
+            Tracking performance on a long-term DLO motion sequence under dynamic, severe occlusions, and large-scale deformation.
+          </p>
+        </div>
+
+        <video id="dynamic_tracking" muted autoplay playsinline height="70%" width="70%" controls="controls">
+            <source src="docs/videos/realworld_tracking/video_dynamic_tracking.mp4" type="video/mp4">
+          </video>
+        
+          <div class="content has-text-justified">
+          <p style="text-align: center; margin-top: 40px; margin-bottom: -10px;">
+            Tracking performance on a long-term DLO motion sequence under dynamic, severe occlusions, and large-scale deformation.
+          </p>
+        </div>
+
+        <video id="dynamic_tracking" muted autoplay playsinline height="80%" width="80%" controls="controls">
+            <source src="docs/videos/realworld_tracking/video_icra_sequence.mp4" type="video/mp4">
+          </video>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="columns is-centered has-text-centered">
+      <div class="container is-max-widescreen">
+
+        <h2 class="title is-3"> Integration in Constrained DLO Manipulation </h2>
+        <div class="content has-text-justified">
+          <p style="text-align: center;">
+            A dual-arm robot rigidly grasps the two ends of a DLO and manipulates it toward a desired 3-D configuration, <br>where continuous collision avoidance and occlusion-robust perception is required.
+            The proposed UniStateDLO serves as<br> the <b>front-end perception module</b>, which provides real-time feedback for the downstream controller.
+          </p>
+        </div>
+
+        <h3 class="title is-4" style="margin-top: 40px;">DLO Shape Control Task 1</h3>
+        <div class="content has-text-justified">
+          <p style="text-align: center;margin-bottom: -10px;">
+            Accurate state estimation and tracking with <b>occlusions in initial states</b>, 
+            supporting to manipulate the DLO to desired shape <b>while avoiding obstacles</b>.
+          </p>
+        </div>
+
+        <video id="dynamic_tracking" muted autoplay playsinline height="80%" width="80%" controls="controls">
+          <source src="docs/videos/realworld_manip/realworld_manip1.mp4" type="video/mp4">
+        </video>
+        
+        <h3 class="title is-4" style="margin-top: 40px;">DLO Shape Control Task 2</h3>
+        <div class="content has-text-justified">
+          <p style="text-align: center;margin-bottom: -10px;">
+            Reliable during intermediate stage of manipulation, finally reaching <b>complex configurations with self-intersections</b>.
+          </p>
+        </div>
+
+        <video id="dynamic_tracking" muted autoplay playsinline height="80%" width="80%" controls="controls">
+          <source src="docs/videos/realworld_manip/realworld_manip2.mp4" type="video/mp4">
+        </video>
+
+        <h3 class="title is-4" style="margin-top: 40px;">DLO Shape Control Task 3</h3>
+        <div class="content has-text-justified">
+          <p style="text-align: center;margin-bottom: -10px;">
+            Robust under <b>large-scale occlusion</b>, even when <b>one endpoint of DLO becomes completely invisible</b> for an extended period.
+          </p>
+        </div>
+
+        <video id="dynamic_tracking" muted autoplay playsinline height="80%" width="80%" controls="controls">
+          <source src="docs/videos/realworld_manip/realworld_manip3.mp4" type="video/mp4">
+        </video>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="content has-text-centered">
+          <p>
+            Website template borrowed from <a href="https://robopil.github.io/adaptigraph/">AdaptiGraph</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .grid-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    /* 视频之间的间距 */
+    flex-wrap: nowrap;
+    /* 若想小屏换行，改为 wrap */
+    width: 100%;
+  }
+
+  /* 通用媒体项 */
+  .media-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;            /* 自动分配宽度 */
+    max-width: 23%;     /* 控制最大宽度，可根据需要调整 */
+  }
+
+  /* 图片和视频共有样式 */
+  .media-item p {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 16px;
+  }
+
+  .group1 .media-item img,
+  .group1 .media-item video {
+    width: auto;
+    height: 200px;
+    border-radius: 8px;
+    object-fit: contain;
+    background-color: #ffffff;
+    display: block;
+  }
+
+  .group2 .media-item video {
+    width: auto;
+    height: 175px;
+    border-radius: 8px;
+    object-fit: contain;
+    background-color: #ffffff;
+    display: block;
+  }
+
+  .video-wrapper video {
+    height: 300px;           /* 固定高度 */
+    width: auto;             /* 自动计算宽度，保持比例 */
+    object-fit: contain;     /* 保持比例，空白部分填充背景 */
+    background-color: #ffffff; /* 白色填充 */
+    display: inline-block;
+    border-radius: 2px;
+  }
+
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const sections = [
+      { url: "sections/realworld_detection.html", id: "realworld-detection", carouselId: "realworld-detection-carousel" },
+      { url: "sections/realworld_detection_more_case.html", id: "realworld-detection-more-case", carouselId: "realworld-detection-more-case-carousel" },
+      { url: "sections/realworld_tracking.html", id: "realworld-tracking", carouselId: "realworld-tracking-carousel" },
+    ];
+    Promise.all(
+      sections.map(sec =>
+        fetch(sec.url)
+          .then(res => res.text())
+          .then(html => {
+            document.getElementById(sec.id).innerHTML = html;
+
+            // Initialize this carousel
+            const carousels = bulmaCarousel.attach(`#${sec.carouselId}`, {
+              slidesToScroll: 1,
+              slidesToShow: 1,
+              loop: true,
+              autoplay: false
+            });
+
+            const carousel = carousels[0];
+            const slides = document.querySelectorAll(`#${sec.carouselId} .grid-container`);
+
+            // Video autoplay control
+            slides.forEach((slide, i) => {
+              const vids = slide.querySelectorAll('video');
+              vids.forEach(v => {
+                if (i === 0) v.play();
+                else {
+                  v.pause();
+                  v.currentTime = 0;
+                }
+              });
+            });
+
+            carousel.on('before:show', state => {
+              slides.forEach((slide, i) => {
+                const vids = slide.querySelectorAll('video');
+                vids.forEach(v => {
+                  if (i === state.next) v.play();
+                  else {
+                    v.pause();
+                    v.currentTime = 0;
+                  }
+                });
+              });
+            });
+
+          })
+      )
+    ).catch(err => console.error("Error loading sections:", err));
+  });
+</script>
+
+</body>
+
+</html>
